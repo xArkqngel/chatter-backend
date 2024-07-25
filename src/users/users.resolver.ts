@@ -29,9 +29,6 @@ export class UsersResolver {
     return this.usersService.findOne(_id);
   }
   /**
- * 
- * @param updateUserInput 
- * @returns 
  * This method is used to modify based on the incoming user input, instead the user id is taken from the token payload to only
  * be able to modify the user that is logged in.
   @Mutation(() => User)
@@ -53,5 +50,11 @@ export class UsersResolver {
   @UseGuards(GqlAuthGuard)
   removeUser(@CurrentUser() user: TokenPayload) {
     return this.usersService.remove(user._id);
+  }
+
+  @Query(() => User, { name: 'me' })
+  @UseGuards(GqlAuthGuard)
+  getMe(@CurrentUser() user: TokenPayload) {
+    return user;
   }
 }
