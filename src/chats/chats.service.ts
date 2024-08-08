@@ -16,8 +16,10 @@ export class ChatsService {
     });
   }
 
-  async findAll() {
-    return this.chatsRepository.find({});
+  async findAll(userId: string) {
+    return this.chatsRepository.find({
+      ...this.userChatFilter(userId),
+    });
   }
 
   async findOne(_id: string) {
@@ -30,5 +32,20 @@ export class ChatsService {
 
   remove(id: number) {
     return `This action removes a #${id} chat`;
+  }
+
+  userChatFilter(userId: string) {
+    return {
+      $or: [
+        { userId }, //is owner
+        {
+          userIds: {
+            //is participant
+            $in: [userId],
+          },
+        },
+        { isPrivate: false }, //is public
+      ],
+    };
   }
 }
