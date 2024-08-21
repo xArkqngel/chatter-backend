@@ -1,6 +1,6 @@
 import { Logger, NotFoundException } from '@nestjs/common';
-import { FilterQuery, Model, Types, UpdateQuery } from 'mongoose';
 import { AbstractEntity } from './abstract.entity';
+import { FilterQuery, Model, Types, UpdateQuery } from 'mongoose';
 
 export abstract class AbstractRepository<T extends AbstractEntity> {
   protected abstract readonly logger: Logger;
@@ -12,14 +12,15 @@ export abstract class AbstractRepository<T extends AbstractEntity> {
       ...document,
       _id: new Types.ObjectId(),
     });
-    return (await createdDocument.save()).toJSON() as T;
+    return (await createdDocument.save()).toJSON() as unknown as T;
   }
 
   async findOne(filterQuery: FilterQuery<T>): Promise<T> {
-    const document = await this.model.findOne(filterQuery).lean<T>();
+    const document = await this.model.findOne(filterQuery, {}).lean<T>();
+
     if (!document) {
-      this.logger.warn('Document not found:', filterQuery);
-      throw new NotFoundException('Document not found');
+      this.logger.warn('Document was not found with filterQuery', filterQuery);
+      throw new NotFoundException('Document not found.');
     }
 
     return document;
@@ -27,17 +28,17 @@ export abstract class AbstractRepository<T extends AbstractEntity> {
 
   async findOneAndUpdate(
     filterQuery: FilterQuery<T>,
-    updateQuery: UpdateQuery<T>,
+    update: UpdateQuery<T>,
   ): Promise<T> {
     const document = await this.model
-      .findOneAndUpdate(filterQuery, updateQuery, {
+      .findOneAndUpdate(filterQuery, update, {
         new: true,
       })
       .lean<T>();
 
     if (!document) {
-      this.logger.warn('Document not found:', filterQuery);
-      throw new NotFoundException('Document not found');
+      this.logger.warn('Document was not found with filterQuery', filterQuery);
+      throw new NotFoundException('Document not found.');
     }
 
     return document;

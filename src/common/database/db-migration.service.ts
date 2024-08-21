@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { config, database, up } from 'migrate-mongo';
 
 @Injectable()
-export class DBMigrationSerivce implements OnModuleInit {
+export class DbMigrationService implements OnModuleInit {
   private readonly dbMigrationConfig: Partial<config.Config> = {
     mongodb: {
       databaseName: this.configService.getOrThrow('DB_NAME'),
