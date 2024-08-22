@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ModelDefinition, MongooseModule } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
-import { DBMigrationSerivce } from './db-migration.service';
+import { DbMigrationService } from './db-migration.service';
 
 @Module({
   imports: [
@@ -12,7 +12,7 @@ import { DBMigrationSerivce } from './db-migration.service';
       inject: [ConfigService],
     }),
   ],
-  providers: [DBMigrationSerivce],
+  providers: [DbMigrationService],
 })
 export class DatabaseModule {
   static forFeature(models: ModelDefinition[]) {
