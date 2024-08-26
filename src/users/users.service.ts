@@ -3,10 +3,15 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import * as bcrypt from 'bcrypt';
+import { S3Service } from 'src/common/s3/s3.service';
+import { USERS_BUCKET, USERS_IMAGE_FILE_EXTENSION } from './users.constants';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly s3Service: S3Service,
+  ) {}
 
   async create(createUserInput: CreateUserInput) {
     try {
@@ -19,6 +24,14 @@ export class UsersService {
         throw new UnauthorizedException('Email already exists');
       }
     }
+  }
+
+  async uploadImage(file: Buffer, userId: string) {
+    await this.s3Service.upload({
+      bucket: USERS_BUCKET,
+      key: `${userId}.${USERS_IMAGE_FILE_EXTENSION}`,
+      file,
+    });
   }
 
   private async hashPassword(password: string) {
