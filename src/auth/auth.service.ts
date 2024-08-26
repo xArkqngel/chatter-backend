@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { User } from '../users/entities/user.entity';
 import { Request, Response } from 'express';
-import { User } from 'src/users/entities/user.entity';
+import { ConfigService } from '@nestjs/config';
 import { TokenPayload } from './token-payload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { getJwt } from './jwt';
@@ -27,8 +27,8 @@ export class AuthService {
     const token = this.jwtService.sign(tokenPayload);
 
     response.cookie('Authentication', token, {
-      expires,
       httpOnly: true,
+      expires,
     });
 
     return token;
@@ -45,8 +45,8 @@ export class AuthService {
 
   logout(response: Response) {
     response.cookie('Authentication', '', {
-      expires: new Date(0),
       httpOnly: true,
+      expires: new Date(),
     });
   }
 }
